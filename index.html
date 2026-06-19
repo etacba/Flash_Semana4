@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CBA — Flash Semanal · Estação de Tratamento de Água</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-width: 240px;
+
+      --blue-primary: #113CEA;
+      --blue-dark: #000064;
+      --cyan: #0FD3E8;
+      --purple: #430098;
+
+      --bg-base: #FFFFFF;
+      --bg-panel: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --bg-card-hover: #F5F7FA;
+
+      --border: #DDE5F0;
+      --border-strong: #C7D3E5;
+
+      --text-primary: #1F2937;
+      --text-secondary: #4B5563;
+      --text-muted: #6B7280;
+
+      --green:  #00A651;
+      --yellow: #F59E0B;
+      --red: #DC2626;
+}
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+   body::before {
+     content: '';
+     position: fixed;
+     inset: 0;
+     background-image:
+       linear-gradient(rgba(17,60,234,0.03) 1px, transparent 1px),
+       linear-gradient(90deg, rgba(17,60,234,0.03) 1px, transparent 1px);
+     background-size: 40px 40px;
+     pointer-events: none;
+     z-index: 0;
+}
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -40%;
+      left: -20%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(
+         ellipse at center,
+         rgba(17,60,234,0.05) 0%,
+         transparent 70%
+  );
+   pointer-events: none;
+   z-index: 0;
+}
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: #FFFFFF;border-right: 1px solid #DDE5F0;
+      border-right: 1px solid var(--border);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      backdrop-filter: blur(20px);
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cba-logo-mark {
+      width: 52px;
+      height: 52px;
+    }
+
+    .sidebar-brand {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 3px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .sidebar-sub {
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+      overflow-y: auto;
+    }
+
+    .nav-section-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 12px 20px 6px;
+      font-weight: 600;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 2px solid transparent;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-item:hover {
+      background: rgba(15,211,232,0.06);
+      color: var(--cyan);
+      border-left-color: rgba(15,211,232,0.4);
+    }
+
+    .nav-item.active {
+      background: rgba(17,60,234,0.25);
+      color: var(--cyan);
+      border-left-color: var(--cyan);
+    }
+
+    .nav-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 6px;
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,229,160,0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,229,160,0); }
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: #FFFFFF; border-bottom: 1px solid #DDE5F0;
+      border-bottom: 1px solid var(--border-strong);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 88px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      backdrop-filter: blur(20px);
+    }
+
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--blue-primary), transparent);
+      opacity: 0.6;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header-logo {
+      width: 48px;
+      height: 48px;
+    }
+
+    .header-titles h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color:  #1F2937;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .header-titles h1 span {
+      color: var(--cyan);
+    }
+
+    .header-titles p {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .period-badge {
+      background: linear-gradient(135deg, rgba(15,211,232,0.15), rgba(17,60,234,0.15));
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .period-badge .period-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .period-badge .period-value {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--cyan);
+      letter-spacing: 1px;
+    }
+
+    .header-meta {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* ===== CONTENT ===== */
+    .content {
+      padding: 32px 40px 60px;
+    }
+
+    /* ===== SECTION ===== */
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .section-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+    }
+
+    .section-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .section-tag {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      background: rgba(15,211,232,0.1);
+      border: 1px solid rgba(15,211,232,0.2);
+      border-radius: 3px;
+      padding: 2px 8px;
+    }
+
+    /* ===== CARDS GRID ===== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .cards-grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    /* ===== KPI CARD ===== */
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+.kpi-industrial {
+  background: #FFFFFF;
+  border-left: 5px solid #430098;
+}
+
+.kpi-potavel {
+  background: #FFFFFF;
+  border-left: 5px solid #0FD3E8;
+}
+
+.kpi-roxo {
+  background: #FFFFFF;
+  border-left: 5px solid #430098;
+}
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue-primary));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .kpi-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(15,211,232,0.08);
+    }
+
+    .kpi-card:hover::before { opacity: 1; }
+
+    .kpi-card.status-ok::before { background: linear-gradient(90deg, var(--green), var(--cyan)); opacity: 1; }
+    .kpi-card.status-warn::before { background: linear-gradient(90deg, var(--yellow), #FF8C00); opacity: 1; }
+    .kpi-card.status-crit::before { background: linear-gradient(90deg, var(--red), #FF8C00); opacity: 1; }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .kpi-status-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .kpi-status-icon.ok { background: rgba(0,229,160,0.12); color: var(--green); }
+    .kpi-status-icon.warn { background: rgba(255,184,0,0.12); color: var(--yellow); }
+    .kpi-status-icon.crit { background: rgba(255,59,92,0.12); color: var(--red); }
+
+    .kpi-value {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+
+    .kpi-unit {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+    }
+
+    .kpi-delta {
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .kpi-delta.up { color: var(--red); }
+    .kpi-delta.down { color: var(--green); }
+    .kpi-delta.neutral { color: var(--text-muted); }
+
+    .kpi-sparkline {
+      margin-top: 12px;
+      height: 36px;
+    }
+
+    .kpi-sparkline canvas {
+      width: 100% !important;
+    }
+
+    .kpi-limit {
+      font-size: 9px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== CHARTS ROW ===== */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .charts-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .chart-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-panel-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .chart-panel-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      position: relative;
+    }
+
+    /* ===== TABLE ===== */
+    .table-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-header-row {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .table-count {
+      font-size: 10px;
+      color: var(--cyan);
+      background: rgba(15,211,232,0.1);
+      border: 1px solid rgba(15,211,232,0.2);
+      border-radius: 10px;
+      padding: 2px 10px;
+      letter-spacing: 1px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 10px 16px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-align: left;
+      background: #F3F6FA;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: rgba(15,211,232,0.03);
+    }
+
+    tbody td {
+      padding: 13px 16px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+
+    .td-acao {
+      font-weight: 500;
+      color: var(--text-primary);
+      max-width: 280px;
+    }
+
+    .td-resp {
+      font-size: 11px;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    .td-prazo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .badge.concluido {
+      background: rgba(0,229,160,0.12);
+      color: var(--green);
+      border: 1px solid rgba(0,229,160,0.25);
+    }
+    .badge.concluido .badge-dot { background: var(--green); }
+
+    .badge.andamento {
+      background: rgba(255,184,0,0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(255,184,0,0.25);
+    }
+
+    .badge.andamento .badge-dot {
+     background: var(--yellow);
+    }
+
+    .badge.atrasado {
+      background: rgba(255,184,0,0.12);
+      color: var(--red);
+      border: 1px solid rgba(255,59,92,0.25);
+    }
+    .badge.atrasado .badge-dot { background: var(--yellow); }
+
+    .badge.nao_iniciado {
+      background: rgba(255,59,92,0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(255,184,0,0.25);
+    }
+    .badge.nao_iniciado .badge-dot { background: var(--red); }
+
+    /* ===== TEXT BOXES ===== */
+    .text-boxes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .text-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .text-box-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .text-box-content {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .text-box-wide {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .obs-box {
+      background: linear-gradient(135deg, rgba(17,60,234,0.08), rgba(67,0,152,0.06));
+      border: 1px solid rgba(17,60,234,0.25);
+    }
+
+    .dir-box {
+      background: linear-gradient(135deg, rgba(67,0,152,0.08), rgba(17,60,234,0.06));
+      border: 1px solid rgba(67,0,152,0.25);
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bullet-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .bullet-list li::before {
+      content: '◈';
+      color: var(--cyan);
+      font-size: 10px;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ===== GAUGE ===== */
+    .gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(15,211,232,0.2); border-radius: 2px; }
+
+    /* ===== DIVIDER ===== */
+    .divider-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 8px 0 20px;
+    }
+
+    /* ===== LOADING OVERLAY ===== */
+    #loading-overlay {
+      position: fixed; inset: 0;
+      background: var(--bg-base);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity 0.6s ease;
+    }
+
+    .loader-logo {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      color: var(--cyan);
+      animation: loader-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loader-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .loader-bar {
+      width: 200px; height: 2px;
+      background: rgba(15,211,232,0.15);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .loader-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue-primary), var(--cyan));
+      border-radius: 1px;
+      animation: loader-fill 1.5s ease-in-out forwards;
+    }
+
+    @keyframes loader-fill {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    .loader-text {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ===== FADE IN ===== */
+    .fade-in {
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in:nth-child(1) { animation-delay: 0.05s; }
+    .fade-in:nth-child(2) { animation-delay: 0.10s; }
+    .fade-in:nth-child(3) { animation-delay: 0.15s; }
+    .fade-in:nth-child(4) { animation-delay: 0.20s; }
+    .fade-in:nth-child(5) { animation-delay: 0.25s; }
+
+    /* ===== EXCEL NOTE ===== */
+    .excel-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      background: rgba(0,229,160,0.05);
+      border: 1px solid rgba(0,229,160,0.12);
+      border-radius: 4px;
+      padding: 3px 10px;
+    }
+
+    .excel-note::before {
+      content: '⬛';
+      font-size: 8px;
+      color: #1D7044;
+    }
+
+.executive-summary{
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+.executive-alert{
+  padding:10px 14px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:600;
+}
+
+.executive-alert.red{
+  background:rgba(220,38,38,.10);
+  border:1px solid rgba(220,38,38,.30);
+  color:#DC2626;
+}
+
+.executive-alert.yellow{
+  background:rgba(245,158,11,.10);
+  border:1px solid rgba(245,158,11,.30);
+  color:#F59E0B;
+}
+
+.executive-alert.green{
+ background:#00A651;
+  border:1px solid #008F45;
+  color:#FFFFFF;
+  font-weight:700;
+  box-shadow:0 4px 12px rgba(0,166,81,.25);
+}
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1400px) {
+      .cards-grid-5 { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      :root { --sidebar-width: 64px; }
+      .sidebar-logo, .nav-section-label, .sidebar-brand, .sidebar-sub, .nav-item span { display: none; }
+      .nav-item { justify-content: center; padding: 12px; }
+      .sidebar-footer { display: none; }
+      .header { padding: 0 20px; }
+      .content { padding: 20px; }
+      .charts-row { grid-template-columns: 1fr; }
+      .charts-row-3 { grid-template-columns: 1fr; }
+      .text-boxes-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 2000px) {
+      :root { --sidebar-width: 260px; }
+      .cards-grid-5 { grid-template-columns: repeat(5, 1fr); }
+      .header-titles h1 { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="loader-logo">CBA</div>
+  <div style="font-size:10px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-top:-8px;">Estação de Tratamento de Água</div>
+  <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+  <div class="loader-text">Carregando painel executivo...</div>
+</div>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ============================================================
+// CONFIGURAÇÃO DE DADOS — alimentado via Excel Online/OneDrive
+// Em produção, substituir por fetch() ao endpoint do Excel/SharePoint
+// Veja o arquivo INTEGRACAO_EXCEL.md para instruções completas
+// ============================================================
+const MOCK_DATA = {
+  periodo: "14 a 19 de Junho de 2026",
+  semana: "Semana 04 · 2026",
+  atualizadoEm: "19/06/2026 13:19",
+
+  // Aba: KPIs
+  kpis: {
+    ph: { valor: 8.5, limite_max: 10.0, semana_ant: 8.8, status: "ok", historico: [8.75,8.8,8.5] },
+    turbidez: { valor: 33.58, limite_max: 30.0, semana_ant: 27.5, status: "warn", unidade: "NTU", historico: [22.83,27.5,33.58] },
+    sulfato: { valor:1068, limite_max: 1000, semana_ant: 1190, status: "warn", unidade: "mg/L", historico: [981,1068,1105,1096,1191,1090,1068] },
+    caustica: { valor: 5, status: "warn", semana_ant: 5,unidade: "ocorrências", historico: [7,8,8,8,5,5,5] },
+    backlog: { valor: 55, semana_ant: 68, status: "warn", unidade: "dias", historico: [76,52,75,101,75,81,68,55] },
+  },
+
+  // Aba: Indicadores Industriais ( KPIS mensais)
+  indicadores: {
+    ph_saida: {
+      labels: ["14/06","15/06","16/06","17/06","18/06","19/06"],
+      valores: [7.64,8.1,9.6,8.83,7.1,8],
+      limite_max: 10
+    },
+    turbidez_saida: {
+      labels: ["14/06","15/06","16/06","17/06","18/06","19/06"],
+      valores: [30.1, 70.15,67.22,14.47,13.67,23.35],
+      limite_max: 30.0
+    },
+    sulfato_serie: {
+      labels: ["14/06","15/06","16/06","17/06","18/06","19/06"],
+      valores: [1100,1100,970,1000,1100,1140],
+      limite_max: 1000
+    },
+    lodo: {
+      labels: ["14/06","15/06","16/06","17/06","18/06","19/06"],
+      valores: [37.774,19.442,17.032,17.572,11.266,24.692],
+      unidade: "ton"
+    }
+  },
+
+  // Aba: Backlog
+  backlog_mensal: {
+    labels: ["14/06","15/06","16/06","17/06","18/06"],
+    concluidas: [67,64,47,46,55],
+    meta: 60
+  },
+
+  // Aba: Plano de Ações
+// Aba: Plano de Ação
+acoes: [
+  { 
+    id: 1,
+    acao: "Realizar limpeza do fosso de captação do Pirajibu na próxima semana",
+    responsavel: "Gesiel",
+    prazo: "27/06/2026",
+    status: "Em andamento",
+    obs: ""
+  },
+
+  { 
+    id: 2,
+    acao: "Realizar testes de retrolavagem dos novos filtros da ETAI.",
+    responsavel: "Andrea e Rodrigo",
+    prazo: "--/--/----",
+    status: "Em andamento",
+    obs: ""
+  },
+
+  { 
+    id: 3,
+    acao: "Investigar e eliminar vazamento de água potável próximo ao pátio dos caminhões",
+    responsavel: "Márcio",
+    prazo: "27/06/2026",
+    status: "Em andamento",
+    obs: ""
+  },
+
+  { 
+    id: 4,
+    acao: "Substituição de bomba do Decuor 1 devido a problemas internos na bomba",
+    responsavel: "Márcio",
+    prazo: "20/06/2026",
+    status: "Em andamento",
+    obs: ""
+  },
+
+  { 
+    id: 5,
+    acao: "Eliminar vazamento na guarnição do Pirajibu",
+    responsavel: "Gesiel e Márcio",
+    prazo: "16/06/2026",
+    status: "Concluído",
+    obs: ""
+  },
+
+  { 
+    id: 6,
+    acao: "Substituir válvula de recalque da bomba 1 do Pirajibu",
+    responsavel: "Márcio",
+    prazo: "17/06/2026",
+    status: "Concluído",
+    obs: "Caráter emergencial - travamento aberto da válvula, impossibilitando de reestabelecer bombeamento"
+  },
+ { 
+    id: 7,
+    acao: "Inspeção rede de interligação das áreas 1 e 2 de água potável",
+    responsavel: "Gesiel",
+    prazo: "17/06/2026",
+    status: "Concluído",
+    obs: "Identificado 2 vazamentos - em contato com equipe do meio ambiente e roçagem para liberação e limpeza da área, com o objetivo de realizar os devidos reparos"
+  },
+
+  { 
+    id: 8,
+    acao: "Eliminar vazamento no Dário",
+    responsavel: "Márcio",
+    prazo: "18/06/2026",
+    status: "Concluído",
+    obs: ""
+  },
+
+  { 
+    id: 9,
+    acao: "Investigar e eliminar vazamento na Vila Industrial",
+    responsavel: "Márcio",
+    prazo: "27/06/2026",
+    status: "Em andamento",
+    obs: "Identificado fluxo de vazamento de água potável que estava direcionado para a caixa de esgoto, próximo ao restaurante externo - aberta nota emergencial e documentações necessárias já em processo para início dos trabalhos"
+  },
+
+  { 
+    id: 10,
+    acao: "Realizar limpeza do lado B do reservatório (W1RAP01) Concreto",
+    responsavel: "Gesiel",
+    prazo: "16/06/2026",
+    status: "Concluído",
+    obs: "trabalho em conjunto com a Rocha Forte, reprogramdo a limpeza do lado A para começo de julho, devido a criticidade dos reservatórios"
+  },
+{ 
+    id: 11,
+    acao: "Inicio da mobilização e documentações da Solu Draga",
+    responsavel: "Gesiel",
+    prazo: "--/--/2026",
+    status: "Em andamento",
+    obs: ""
+  },
+],
+
+  // Aba: Status dos Planos
+  status_planos: {
+    concluido: 2,
+    andamento: 4,
+    atrasado: 0,
+    nao_iniciado: 0
+  },
+
+  // Aba: Melhorias
+  melhorias_implementadas: [
+	
+  ],
+  melhorias_andamento: [
+    "Implementação de programa 'ETA Champion' que visa o reconhecimento dos operadores destaques através de inspeções quinzenais, rodando áreas e turnos. Previsão de início: primeira semana de julho",
+    "Desenvolvimento de ferramenta para triagem de Fale Fácil, com o objetivo de garantir registros mais completos e de qualidade no sistema do Obra Soft.",
+    "Desenvolvimento do agente de IA “Peixe” para suporte operacional e apoio à tomada de decisão na ETA.",
+    "Aprimoramento do painel executivo “Flash Semanal”, com foco em visualização estratégica de KPIs e comunicação gerencial para a diretoria.",
+    "Desenvolvimento de fluxogramas operacionais dos processos da ETA, com foco em padronização das atividades e suporte à tomada de decisão dos operadores durante a rotina operacional.",
+  ],
+
+  // Aba: Observações 
+  observacoes: "As contaminações cáusticas registradas no início da semana impactaram significativamente o desempenho da Estação de Tratamento de Água Industrial (ETAI), gerando instabilidade operacional e resultando, em alguns períodos ao longo do dia, na produção de água de reuso fora das especificações estabelecidas. Nessas condições, torna-se necessária a complementação do sistema com água nova proveniente da Lagoa dos Patos ou do Rio Pirajibu. Essa prática, embora necessária para garantir a continuidade operacional e a qualidade da água fornecida, provoca desequilíbrio no balanço hídrico da unidade e aumento dos custos operacionais.Diante desse cenário, em 16/06 foi definida a suspensão da limpeza da lagoa de efluentes e do envio de efluentes para o Palmital, mantendo-se essa condição até a ocorrência de eventos de elevada precipitação pluviométrica ou contaminações cáusticas de alta concentração. Após a implementação da medida, observou-se maior estabilidade operacional na ETAI, com redução dos níveis de pH e turbidez, resultando em melhoria da qualidade da água de reuso produzida.",
+
+  // Aba: Apoio Diretoria
+  apoio_diretoria: [
+    
+  ]
+};
+
+// ============================================================
+// SVG DA LOGO CBA (estilizada)
+// Em produção, substituir pela logo oficial PNG/SVG da CBA
+// ============================================================
+const CBALogo = ({ size = 48 }) => (
+  <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="url(#lg1)"/>
+    <text x="50%" y="58%" dominantBaseline="middle" textAnchor="middle"
+      fontFamily="Rajdhani, sans-serif" fontWeight="700" fontSize="18"
+      fill="white" letterSpacing="1">CBA</text>
+    <defs>
+      <linearGradient id="lg1" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#113CEA"/>
+        <stop offset="1" stopColor="#000064"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+// ============================================================
+// SPARKLINE CHART
+// ============================================================
+const Sparkline = ({ data, color = '#0FD3E8', id }) => {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    if (chartRef.current) chartRef.current.destroy();
+    const ctx = canvasRef.current.getContext('2d');
+    chartRef.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.map((_, i) => i),
+        datasets: [{ data, borderColor: color, borderWidth: 1.5,
+          pointRadius: 0, tension: 0.4,
+          fill: true,
+          backgroundColor: (ctx) => {
+            const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 36);
+            g.addColorStop(0, color + '30'); g.addColorStop(1, 'transparent');
+            return g;
+          }
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false } },
+        animation: { duration: 800 }
+      }
+    });
+    return () => chartRef.current?.destroy();
+  }, [data, color]);
+
+  return <div style={{ height: 36, marginTop: 12 }}><canvas ref={canvasRef} /></div>;
+};
+
+// ============================================================
+// LINHA CHART PANEL
+// ============================================================
+const LineChartPanel = ({ title, sub, labels, datasets, height = 200, showLimite = false, limiteMax, limiteMin, note }) => {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    if (chartRef.current) chartRef.current.destroy();
+    const ctx = canvasRef.current.getContext('2d');
+
+    const ds = datasets.map((d, i) => ({
+  label: d.label,
+  data: d.data,
+  borderColor: d.color || '#0FD3E8',
+  backgroundColor: 'transparent',
+  borderWidth: 2,
+  pointRadius: 3,
+  pointBackgroundColor: d.color || '#0FD3E8',
+  tension: 0.4,
+  borderDash: d.dashed ? [6,6] : [],
+  fill: d.fill
+    ? { target: 'origin', above: (d.color || '#0FD3E8') + '15' }
+    : false
+}));
+
+    if (limiteMax !== undefined) {
+      ds.push({ label: 'Limite máx.', data: Array(labels.length).fill(limiteMax),
+        borderColor: '#FF3B5C', borderWidth: 1, borderDash: [4,4],
+        pointRadius: 0, fill: false });
+    }
+    if (limiteMin !== undefined) {
+      ds.push({ label: 'Limite mín.', data: Array(labels.length).fill(limiteMin),
+        borderColor: '#FFB800', borderWidth: 1, borderDash: [4,4],
+        pointRadius: 0, fill: false });
+    }
+
+    chartRef.current = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: ds },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: ds.length > 1, position: 'bottom',
+            labels: { color: '#4B5563', font: { size: 10 }, boxWidth: 12, padding: 12 } },
+          tooltip: { backgroundColor: 'rgba(4,6,15,0.9)', titleColor: '#0FD3E8',
+            bodyColor: '#dbdbdb', borderColor: 'rgba(15,211,232,0.2)', borderWidth: 1 }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6B7280', font: { size: 10 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6B7280', font: { size: 10 } } }
+        }
+      }
+    });
+    return () => chartRef.current?.destroy();
+  }, [JSON.stringify(labels), JSON.stringify(datasets)]);
+
+  return (
+    <div className="chart-panel">
+      <div className="chart-panel-title">{title}</div>
+      <div className="chart-panel-sub">{sub} {note && <span className="excel-note">{note}</span>}</div>
+      <div className="chart-container" style={{ height }}>
+        <canvas ref={canvasRef} />
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// BAR CHART PANEL
+// ============================================================
+const BarChartPanel = ({ title, sub, labels, datasets, height = 200 }) => {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    if (chartRef.current) chartRef.current.destroy();
+    const ctx = canvasRef.current.getContext('2d');
+
+    chartRef.current = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: datasets.map(d => ({
+          label: d.label, data: d.data,
+          backgroundColor: d.color + 'BB',
+          borderColor: d.color,
+          borderWidth: 1, borderRadius: 4,
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: datasets.length > 1, position: 'bottom',
+            labels: { color: 'rgba(219,219,219,0.5)', font: { size: 10 }, boxWidth: 12, padding: 12 } },
+          tooltip: { backgroundColor: 'rgba(4,6,15,0.9)', titleColor: '#0FD3E8', bodyColor: '#dbdbdb' }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#6B7280', font: { size: 10 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6B7280', font: { size: 10 } } }
+        }
+      }
+    });
+    return () => chartRef.current?.destroy();
+  }, [JSON.stringify(labels), JSON.stringify(datasets)]);
+
+  return (
+    <div className="chart-panel">
+      <div className="chart-panel-title">{title}</div>
+      <div className="chart-panel-sub">{sub}</div>
+      <div className="chart-container" style={{ height }}>
+        <canvas ref={canvasRef} />
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// DOUGHNUT — STATUS PLANOS
+// ============================================================
+const DonutPanel = ({ title, sub, data }) => {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+
+  const total = Object.values(data).reduce((a, b) => a + b, 0);
+  const entries = [
+    { label: 'Concluído', value: data.concluido, color: '#00A651' },
+    { label: 'Em Andamento', value: data.andamento, color: '#FFB800' },
+    { label: 'Atrasado', value: data.atrasado, color: '#FF3B5C' },
+    { label: 'nao_iniciado', value: data.nao_iniciado, color: '#7CA9FF' },
+  ];
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    if (chartRef.current) chartRef.current.destroy();
+    const ctx = canvasRef.current.getContext('2d');
+    chartRef.current = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: entries.map(e => e.label),
+        datasets: [{ data: entries.map(e => e.value),
+          backgroundColor: entries.map(e => e.color + 'BB'),
+          borderColor: entries.map(e => e.color),
+          borderWidth: 1.5,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: { display: false
+         },
+          tooltip: { backgroundColor: 'rgba(4,6,15,0.9)', titleColor: '#0FD3E8', bodyColor: '#dbdbdb' }
+        }
+      }
+    });
+    return () => chartRef.current?.destroy();
+  }, [JSON.stringify(data)]);
+
+  return (
+    <div className="chart-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="chart-panel-title">{title}</div>
+      <div className="chart-panel-sub">{sub}</div>
+      <div style={{ position: 'relative', flex: 1, minHeight: 180 }}>
+        <canvas ref={canvasRef} />
+        <div style={{ position:'absolute', top:'45%', left:'50%', transform:'translate(-50%,-50%)',
+          textAlign:'center', pointerEvents:'none', marginTop: -12 }}>
+          <div style={{ fontFamily:'Rajdhani', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', lineHeight:1 }}>{total}</div>
+          <div style={{ fontSize: 9, letterSpacing: 1.5, color: 'var(--text-muted)', textTransform:'uppercase' }}>total</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// KPI CARD
+// ============================================================
+const KPICard = ({ label, value, unit, status, delta, historico, limite, icon, cardClass = "", invertDelta = false }) => {
+  const statusMap = { ok: { cls: 'ok', icon: '✓' }, warn: { cls: 'warn', icon: '!' }, crit: { cls: 'crit', icon: '✕' } };
+  const s = statusMap[status] || statusMap.ok;
+  const cardColor =
+  cardClass === "kpi-potavel"
+    ? "#0FD3E8"
+    : "#430098";
+  const deltaNum = delta !== undefined ? (value - delta) : null;
+  const deltaDir = invertDelta
+    ? (deltaNum > 0 ? 'down' : deltaNum < 0 ? 'up' : 'neutral')
+    : (deltaNum > 0 ? 'up' : deltaNum < 0 ? 'down' : 'neutral');
+  const deltaDisplay = deltaNum !== null ? `${deltaNum > 0 ? '+' : ''}${deltaNum.toFixed(deltaNum % 1 === 0 ? 0 : 2)}` : null;
+
+  return (
+    <div className={`kpi-card ${cardClass} fade-in`}>
+      <div className="kpi-header">
+        <div className="kpi-label">{label}</div>
+        <div className={`kpi-status-icon ${s.cls}`}>{s.icon}</div>
+      </div>
+      <div className="kpi-value">
+        {typeof value === 'number' ? value.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) : value}
+        {unit && <span className="kpi-unit"> {unit}</span>}
+      </div>
+      {deltaDisplay && (
+        <div className={`kpi-delta ${deltaDir}`} style={{ color: cardColor }}>
+          {deltaDir === 'up' ? '▲' : deltaDir === 'down' ? '▼' : '–'} {deltaDisplay} vs semana anterior
+        </div>
+      )}
+      {limite && <div className="kpi-limit">Limite: {limite}</div>}
+      {historico && <Sparkline data={historico} color={cardColor} />}
+    </div>
+  );
+};
+
+// ============================================================
+// TABELA PLANO DE AÇÕES
+// ============================================================
+const AcoesTable = ({ acoes }) => {
+  const statusBadge = (s) => ({
+    concluido: <span className="badge concluido"><span className="badge-dot"/>Concluído</span>,
+    andamento: <span className="badge andamento"><span className="badge-dot"/>Em Andamento</span>,
+    atrasado: <span className="badge atrasado"><span className="badge-dot"/>Atrasado</span>,
+    nao_iniciado: <span className="badge nao_iniciado"><span className="badge-dot"/>Não iniciado</span>,
+  }[s] || <span className="badge andamento">{s}</span>);
+
+  const isPrazoVencido = (prazo) => {
+    const [d, m, y] = prazo.split('/');
+    return new Date(`${y}-${m}-${d}`) < new Date();
+  };
+
+  return (
+    <div className="table-panel">
+      <div className="table-header-row">
+        <span className="table-title">Plano de Ações</span>
+        <span className="table-count">{acoes.length} ações</span>
+      </div>
+      <div style={{ overflowX: 'auto' }}>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Ação</th>
+              <th>Responsável</th>
+              <th>Prazo</th>
+              <th>Status</th>
+              <th>Observação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {acoes.map((a) => (
+              <tr key={a.id}>
+                <td style={{ color: 'var(--text-muted)', fontFamily: 'JetBrains Mono', fontSize: 11 }}>{String(a.id).padStart(2,'0')}</td>
+                <td className="td-acao">{a.acao}</td>
+                <td className="td-resp">{a.responsavel}</td>
+                <td className="td-prazo" style={{ color: isPrazoVencido(a.prazo) && a.status !== 'concluido' ? 'var(--black)' : 'var(--text-muted)' }}>{a.prazo}</td>
+                <td>{statusBadge(a.status)}</td>
+                <td style={{ fontSize: 11, color: 'var(--text-muted)', maxWidth: 220 }}>{a.obs}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// SIDEBAR NAV
+// ============================================================
+const navItems = [
+  { id: 'visao', label: 'Visão Geral', icon: '◈' },
+  { id: 'indicadores', label: 'Indicadores', icon: '▦' },
+  { id: 'acoes', label: 'Plano de Ações', icon: '⊞' },
+  { id: 'melhorias', label: 'Melhorias', icon: '⊕' },
+  { id: 'observacoes', label: 'Observações', icon: '≡' },
+  { id: 'diretoria', label: 'Apoio Diretoria', icon: '◧' },
+];
+
+const Sidebar = ({ active, onNav }) => (
+  <aside className="sidebar">
+    <div className="sidebar-logo">
+      <CBALogo size={48} />
+      <div className="sidebar-brand">CBA</div>
+      <div className="sidebar-sub">Tratamento de Água</div>
+    </div>
+    <nav className="sidebar-nav">
+      <div className="nav-section-label">Navegação</div>
+      {navItems.map(item => (
+        <a key={item.id}
+          className={`nav-item${active === item.id ? ' active' : ''}`}
+          onClick={(e) => { e.preventDefault(); onNav(item.id); }}
+          href={`#${item.id}`}>
+          <span style={{ fontSize: 16, lineHeight: 1 }}>{item.icon}</span>
+          <span>{item.label}</span>
+        </a>
+      ))}
+    </nav>
+    <div className="sidebar-footer">
+      <div><span className="status-dot" />Sistema Operacional</div>
+      <div style={{ marginTop: 4 }}>Flash Semanal · ETA CBA</div>
+    </div>
+  </aside>
+);
+
+// ============================================================
+// MAIN DASHBOARD
+// ============================================================
+const Dashboard = () => {
+  const [activeNav, setActiveNav] = useState('visao');
+  const d = MOCK_DATA;
+
+  const handleNav = useCallback((id) => {
+    setActiveNav(id);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) setActiveNav(e.target.id); });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    navItems.forEach(n => { const el = document.getElementById(n.id); if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      <Sidebar active={activeNav} onNav={handleNav} />
+      <div className="main">
+        {/* HEADER */}
+        <header className="header">
+          <div className="header-left">
+            <CBALogo size={52} />
+            <div className="header-titles">
+              <h1>FLASH <span>SEMANAL</span></h1>
+              <p>Estação de Tratamento de Água · Companhia Brasileira de Alumínio</p>
+            </div>
+          </div>
+          <div className="header-right">
+            <div className="period-badge">
+              <span className="period-label">Período</span>
+              <span className="period-value">{d.periodo}</span>
+            </div>
+            <div className="header-meta">{d.semana} · Atualizado em {d.atualizadoEm} <span className="excel-note" style={{ marginLeft: 8 }}>Excel Online</span></div>
+          </div>
+        </header>
+
+        <div className="content">
+
+          {/* ====== VISÃO GERAL ====== */}
+          <section id="visao" className="section">
+
+            <div className="section-header">
+              <h2 className="section-title">Visão Geral</h2>
+              <span className="section-tag"> Média Semanal </span>
+            </div>
+
+            {/* Água Industrial */}
+            <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{  fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#430098', fontWeight: 600
+}}>
+  ◈ Água Industrial
+</span>
+              <div style={{ flex:1, height:1, background: 'var(--border)' }} />
+            </div>
+            <div className="cards-grid-5" style={{ marginBottom: 20 }}>
+              <KPICard cardClass="kpi-industrial" label="pH de Saída" value={d.kpis.ph.valor} status={d.kpis.ph.status}
+                delta={d.kpis.ph.semana_ant} historico={d.kpis.ph.historico}
+                limite={`≤${d.kpis.ph.limite_max}`} />
+              <KPICard  cardClass="kpi-industrial" label="Turbidez de Saída" value={d.kpis.turbidez.valor} unit="NTU" status={d.kpis.turbidez.status}
+                delta={d.kpis.turbidez.semana_ant} historico={d.kpis.turbidez.historico}
+                limite={`≤ ${d.kpis.turbidez.limite_max} NTU`} />
+              <KPICard   cardClass="kpi-industrial"  label="Sulfato" value={d.kpis.sulfato.valor} unit="mg/L" status={d.kpis.sulfato.status}
+                delta={d.kpis.sulfato.semana_ant} historico={d.kpis.sulfato.historico}
+                limite={`≤ ${d.kpis.sulfato.limite_max} mg/L`} />
+              <KPICard  cardClass="kpi-roxo" label="Contaminação Cáustica" value={d.kpis.caustica.valor} unit="ocorrências"
+                status={d.kpis.caustica.status} delta={d.kpis.caustica.semana_ant} 
+                                      historico={d.kpis.caustica.historico}/>
+              {/* Água Potável - Backlog */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                <div style={{ fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--cyan)', fontWeight: 600, marginBottom: 8 }}>◉ Água Potável</div>
+                <KPICard cardClass="kpi-potavel" label="Backlog" value={d.kpis.backlog.valor} unit="dias"
+                  status={d.kpis.backlog.status} delta={d.kpis.backlog.semana_ant}
+                  historico={d.kpis.backlog.historico} invertDelta={true} />
+              </div>
+            </div>
+          </section>
+
+          {/* ====== INDICADORES ====== */}
+          <section id="indicadores" className="section">
+            <div className="section-header">
+              <h2 className="section-title">Indicadores Industriais</h2>
+              <span className="section-tag"> Diários </span>
+            </div>
+
+            <div className="charts-row" style={{ marginBottom: 20 }}>
+              <LineChartPanel
+                title="pH de Saída"
+                sub="Variação diária"
+                labels={d.indicadores.ph_saida.labels}
+                datasets={[{ label: 'pH', data: d.indicadores.ph_saida.valores, color: '#0FD3E8', fill: true }]}
+                limiteMax={d.indicadores.ph_saida.limite_max}
+                height={220}
+                note="Aba: KPIs"
+              />
+              <LineChartPanel
+                title="Turbidez de Saída"
+                sub="NTU"
+                labels={d.indicadores.turbidez_saida.labels}
+                datasets={[{ label: 'Turbidez (NTU)', data: d.indicadores.turbidez_saida.valores, color: '#000064' }]}
+                limiteMax={d.indicadores.turbidez_saida.limite_max}
+                height={220}
+              />
+            </div>
+
+            <div className="charts-row-3">
+              <LineChartPanel
+                title="Sulfato"
+                sub="mg/L"
+                labels={d.indicadores.sulfato_serie.labels}
+                datasets={[{ label: 'Sulfato (mg/L)', data: d.indicadores.sulfato_serie.valores, color: '#000064' }]}
+                limiteMax={d.indicadores.sulfato_serie.limite_max}
+                height={200}
+              />
+              <BarChartPanel
+                title="Lodo Gerado"
+                sub="Toneladas"
+                labels={d.indicadores.lodo.labels}
+                datasets={[{ label: 'Lodo (ton)', data: d.indicadores.lodo.valores, color: '#430098' }]}
+                height={200}
+              />
+              <LineChartPanel
+ 		 title="Backlog"
+ 		 sub="Dias · Água Potável"
+ 		 labels={d.backlog_mensal.labels}
+  		datasets={[
+  	  {
+ 	           label:'Backlog',
+                                      data:d.backlog_mensal.concluidas,
+                                     color:'#0FD3E8',
+                                      fill:true
+                      },
+                  {
+    	         label:'Meta',
+                                    data:Array(d.backlog_mensal.labels.length)
+                                    .fill(d.backlog_mensal.meta),
+                                  color:'#FF3B5C'
+                              }
+                   ]}
+                                height={200}
+	/>
+       </div>
+
+          {/* ====== PLANO DE AÇÕES ====== */}
+          <section id="acoes" className="section">
+            <div className="section-header">
+              <h2 className="section-title">Plano de Ações</h2>
+              <span className="section-tag">{d.acoes.length} Ações</span>
+            </div>
+
+            <div className="charts-row" style={{ marginBottom: 20, gridTemplateColumns: '1fr auto' }}>
+              <AcoesTable acoes={d.acoes} />
+              <div style={{ width: 260 }}>
+                <DonutPanel
+                  title="Status dos Planos"
+                  sub="Distribuição atual"
+                  data={d.status_planos}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* ====== MELHORIAS ====== */}
+          </section>
+          <section id="melhorias" className="section">
+            <div className="section-header">
+              <h2 className="section-title">Melhorias Contínuas</h2>
+              <span className="section-tag">Gestão</span>
+            </div>
+            <div className="text-boxes-grid">
+              <div className="text-box">
+                <div className="text-box-label">✓ Melhorias Implementadas</div>
+                <ul className="bullet-list">
+                  {d.melhorias_implementadas.map((m, i) => <li key={i}>{m}</li>)}
+                </ul>
+              </div>
+              <div className="text-box">
+                <div className="text-box-label">⟳ Melhorias em Andamento</div>
+                <ul className="bullet-list">
+                  {d.melhorias_andamento.map((m, i) => <li key={i}>{m}</li>)}
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* ====== OBSERVAÇÕES ====== */}
+          <section id="observacoes" className="section">
+            <div className="section-header">
+              <h2 className="section-title">Observações Executivas</h2>
+              <span className="section-tag">Análise Operacional</span>
+            </div>
+            <div className="text-box-wide obs-box">
+              <div className="text-box-label">≡ Resumo Semanal · Análise Operacional</div>
+              <div className="text-box-content">
+                {d.observacoes.split('\n\n').map((p, i) => (
+                  <p key={i} style={{ marginBottom: i < d.observacoes.split('\n\n').length - 1 ? 12 : 0 }}>{p}</p>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ====== APOIO DIRETORIA ====== */}
+          <section id="diretoria" className="section">
+            <div className="section-header">
+              <h2 className="section-title">Apoio da Diretoria</h2>
+              <span className="section-tag">Decisões · Recursos</span>
+            </div>
+            <div className="text-box-wide dir-box">
+              <div className="text-box-label">◧ Aprovações · Recursos · Decisões Esperadas</div>
+              <ul className="bullet-list" style={{ marginTop: 12 }}>
+                {d.apoio_diretoria.map((item, i) => <li key={i}>{item}</li>)}
+              </ul>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </>
+  );
+};
+
+// ============================================================
+// APP ROOT
+// ============================================================
+const App = () => {
+  useEffect(() => {
+    setTimeout(() => {
+      const overlay = document.getElementById('loading-overlay');
+      if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 600); }
+    }, 1600);
+  }, []);
+  return <Dashboard />;
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
